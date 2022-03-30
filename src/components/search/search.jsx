@@ -1,64 +1,84 @@
-import { useState, useEffect } from 'react'; 
+import { useState} from 'react'; 
 import InfoCard from '../InfoCard/InfoCard';
-// import SearchBar from '../SearchBar/SearchBar';
+import SearchBar from '../SearchBar/SearchBar';
+import moment from 'moment';
+
+
 
 const Search = (props) => {
 
     const [Info, setInfo] = useState([]);
     const [search, setSearch] = useState("");
-
+    
 
     const handleSearch = (e) => {
         setSearch(e.target.value)
     }
 
     const handleSubmit = (e) => {
-        e.preventDefault();
         fetch(`https://www.reddit.com/user/${search}/about.json`)
             .then(res => res.json())
             .then(data => {
                 setInfo(data.data);
-                console.log(data.data)
+                // console.log(data.data)
             });
     }
-    
 
-    var regDate = new Date(0);
-    regDate.setUTCSeconds(Info.created);
+    // Press Enter to Submit
+    const enterPress = (e) => { 
+        if (e.which === 13) { 
+            handleSubmit() 
+        }
+    }
+
+    
+    var regDateInt = parseInt(Info.created * 1000);
+    var regDate = new Date(regDateInt);
+    var displayDate = regDate.toLocaleDateString();
+    var today = new Date().getTime();
+
+    const startDate = moment(regDateInt);
+    const timeEnd = moment(today);
+    const diff = timeEnd.diff(startDate);
+    const diffDuration = moment.duration(diff);
+    const daysAge = Math.floor(diffDuration.asYears()) + " years"
   
     return (   
         <div>
             <div className='container'>
-                <form onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        id="user-search"
-                        placeholder="enter user name"
-                        onChange={handleSearch}
-                    />
-                    <button type="submit">Search</button>
-                </form>  
+                <SearchBar textChange={handleSearch} buttonClick={handleSubmit} enterPress={enterPress}></SearchBar>
                 {Info.name ? (
                     <div>
-                        <div className='user-info'>
-                            <InfoCard statName="created" statValue={Info.name} />
-                            <InfoCard statName="name" statValue={Info.name} />
+
+                        <div className='avatar'>
+                            <div className='avatar-container'>
+                                <img src={Info.snoovatar_img} alt="user avatar" />
+                            </div>
                             
-                            <img src={Info.snoovatar_img} alt="user avatar" />
+                        </div>
+
+                        <div className='user-info'>
+                            <InfoCard statName="name" statValue={Info.name} />
+                            <InfoCard statName="created" statValue={displayDate} />
+                            <InfoCard statName="age" statValue={daysAge} />
+
                         </div>
                     
                         <div className='info-cards'>
                             <InfoCard statName="Total karma" statValue={Info.total_karma} />
                             <InfoCard statName="Comment karma" statValue={Info.comment_karma} />
                             <InfoCard statName="Link karma" statValue={Info.link_karma} />
-                            
-                            
                         </div>
+
                     </div>
+
+
                 ) : (
-                    <span>please enter reddit user name</span>
+
+
+
+                    <span>enter username above</span>
                 )}            
-                
                 
             </div>
             

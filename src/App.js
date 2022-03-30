@@ -1,5 +1,5 @@
 import './App.css';
-
+import Header from './components/Header/Header';
 import Search from './components/search/search';
 
 function App() {
@@ -8,9 +8,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        Reddit analytics
-      </header>
+      <Header ></Header>
       <Search placeholder="enter reddit user name" />
     </div>
   );
